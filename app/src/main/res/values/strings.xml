@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MisMapas</string>
+    <string name="longitud">longitud:</string>
+    <string name="latitud">latitud:</string>
+</resources>
