@@ -27,29 +27,25 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    Location ultimaUbicacion;
-    FusedLocationProviderClient mFusedLocationClient;
-    int FINE_LOCATION_REQUEST_CODE = 101;
-    Double longitud,latitud;
+    private Location ultimaUbicacion;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private int FINE_LOCATION_REQUEST_CODE = 101;
+    private Double longitud,latitud;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        mFusedLocationClient= LocationServices.
-                getFusedLocationProviderClient(getApplicationContext());
+        mFusedLocationClient= LocationServices.getFusedLocationProviderClient(
+                getApplicationContext());
 
-        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION }, FINE_LOCATION_REQUEST_CODE);
-        }
-        else
-        {
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION },
+                    FINE_LOCATION_REQUEST_CODE);
+        }else {
             solicitaUbicacion();
         }
     }
@@ -63,22 +59,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void solicitaUbicacion(){
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+        // Configurar la solicitud de ubicación
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,
+                10000)
                 .setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
-                .setDurationMillis(500)
+                .setDurationMillis(10000)
                 .build();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
+        // Verificar permisos
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+        // Iniciar actualizaciones de ubicación, se indica la callback que manejará las actualizaciones de
+        // ubicación y que las actualizaciones deben ser manejadas en el hilo principal
         mFusedLocationClient.requestLocationUpdates(locationRequest,mLocationCallback, Looper.getMainLooper());
+        // Obtener última ubicación conocida. En caso de éxito se llama a la rutina onSuccess
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, locationOnSuccessListener);
     }
 
@@ -92,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-
-
 
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
